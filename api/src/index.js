@@ -31,12 +31,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(checkJwt);
 
 async function generateAuth0AccessToken() {
+  // Generate an access token with the client credentials
+  // This access token will be used to call the Auth0 management API
+
   const { data } = await axios.post(
     `https://${process.env.AUTH0_DOMAIN}/oauth/token`,
     {
-      client_id: process.env.AUTH0_CLIENT_ID,
-      client_secret: process.env.AUTH0_CLIENT_SECRET,
-      audience: process.env.AUTH0_AUDIENCE_BACK,
+      client_id: process.env.AUTH0_API_CLIENT_ID,
+      client_secret: process.env.AUTH0_API_CLIENT_SECRET,
+      audience: process.env.AUTH0_API_MANAGEMENT_AUDIENCE,
       grant_type: "client_credentials",
     }
   );
@@ -63,13 +66,13 @@ app.use("/private", async (req, res) => {
       }
     );
 
-    const userId = userInfos.data.sub;
+    const userId = userInfos.data.sub; // auth0 user id
 
     const user = await axios.patch(
       `https://${process.env.AUTH0_DOMAIN}/api/v2/users/${userId}`,
       {
         user_metadata: {
-          mfa: use_mfa,
+          mfa: use_mfa, // custom field to enable/disable mfa
         },
       },
       {
