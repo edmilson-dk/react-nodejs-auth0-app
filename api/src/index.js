@@ -11,24 +11,24 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-const checkJwt = expressjwt({
-  secret: jwksRsa.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
-  }),
-  audience: process.env.AUTH0_AUDIENCE,
-  issuer: `https://${process.env.AUTH0_DOMAIN}/`,
-  algorithms: ["RS256"],
-}).unless({
-  path: ["/public"],
-});
+// const checkJwt = expressjwt({
+//   secret: jwksRsa.expressJwtSecret({
+//     cache: true,
+//     rateLimit: true,
+//     jwksRequestsPerMinute: 5,
+//     jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
+//   }),
+//   audience: process.env.AUTH0_AUDIENCE,
+//   issuer: `https://${process.env.AUTH0_DOMAIN}/`,
+//   algorithms: ["RS256"],
+// }).unless({
+//   path: ["/public"],
+// });
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(checkJwt);
+// app.use(checkJwt);
 
 async function generateAuth0AccessToken() {
   // Generate an access token with the client credentials
@@ -72,7 +72,7 @@ app.use("/private", async (req, res) => {
       `https://${process.env.AUTH0_DOMAIN}/api/v2/users/${userId}`,
       {
         user_metadata: {
-          mfa: use_mfa, // custom field to enable/disable mfa
+          use_mfa,
         },
       },
       {
